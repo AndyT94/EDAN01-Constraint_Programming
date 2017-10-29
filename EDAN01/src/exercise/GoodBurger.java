@@ -3,6 +3,7 @@ package exercise;
 import java.util.ArrayList;
 
 import org.jacop.constraints.LinearInt;
+import org.jacop.constraints.Max;
 import org.jacop.constraints.XeqY;
 import org.jacop.constraints.XltC;
 import org.jacop.core.IntDomain;
@@ -57,8 +58,7 @@ public class GoodBurger {
 
 		IntVar cost = new IntVar(store, "cost", 280, IntDomain.MaxInt);
 		int[] price = { 25, 15, 10, 9, 3, 4, 2, 4 }; // in cent
-		store.impose(new LinearInt(store, ingredients, price, ">=", cost));
-
+		store.impose(new LinearInt(store, ingredients, price, "==", cost));
 		
 		SimpleDFS search = new SimpleDFS(store);
 		search.setVariablesToReport(ingredients);
