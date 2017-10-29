@@ -1,0 +1,6 @@
+#!/bin/sh
+
+prefix=/usr/local/cs/EDAN01/minizinc-2.1.6
+datarootdir=${prefix}/share
+FLATZINC_CMD=fzn-jacop
+minizinc --flatzinc-cmd fzn-jacop --flatzinc-flags "-s -a" -Gjacop "$@"
