@@ -34,7 +34,7 @@ local.properties
 lib/
 
 # Eclipse Core
-.project
+# .project
 
 # External tool builders
 .externalToolBuilders/
@@ -49,7 +49,7 @@ lib/
 .cproject
 
 # JDT-specific (Eclipse Java Development Tools)
-.classpath
+# .classpath
 
 # Java annotation processor (APT)
 .factorypath
