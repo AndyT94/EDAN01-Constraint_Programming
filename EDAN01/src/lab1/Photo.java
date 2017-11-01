@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import org.jacop.constraints.Alldifferent;
 import org.jacop.constraints.Distance;
-import org.jacop.constraints.Eq;
 import org.jacop.constraints.IfThenElse;
 import org.jacop.constraints.SumInt;
 import org.jacop.constraints.XeqC;
@@ -18,7 +17,7 @@ import org.jacop.search.SimpleSelect;
 
 public class Photo {
 	public static void main(String[] args) {
-		new Photo().example(3);
+		new Photo().example(2);
 	}
 
 	private void example(int i) {
@@ -37,6 +36,7 @@ public class Photo {
 					{ 4, 6 }, { 5, 1 }, { 6, 1 }, { 6, 9 }, { 7, 3 }, { 7, 5 }, { 8, 9 }, { 8, 7 }, { 8, 10 },
 					{ 9, 11 }, { 10, 11 } };
 			solve(n2, n_prefs2, prefs2);
+			break;
 		case 3:
 			int n3 = 15;
 			int n_prefs3 = 20;
