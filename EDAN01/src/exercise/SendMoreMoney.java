@@ -47,7 +47,7 @@ import org.jacop.search.SelectChoicePoint;
 import org.jacop.search.SimpleSelect;
 import org.jacop.search.SmallestDomain;
 
-import search.SimpleDFS;
+import lab3.SimpleDFS;
 
 /**
  * 

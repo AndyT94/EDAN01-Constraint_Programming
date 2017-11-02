@@ -17,7 +17,7 @@ import org.jacop.search.SimpleSelect;
 
 public class Photo {
 	public static void main(String[] args) {
-		new Photo().example(2);
+		new Photo().example(1);
 	}
 
 	private void example(int i) {
@@ -67,14 +67,11 @@ public class Photo {
 			dist_prefs[i] = new Distance(people[prefs[i][0] - 1], people[prefs[i][1] - 1], new IntVar(store, 1, 1));
 		}
 
-		// The cost vars
+		// The cost vars and add constraint if distance is fulfilled the var is -1
+		// otherwise 0
 		IntVar[] pref = new IntVar[n_prefs];
 		for (int i = 0; i < n_prefs; i++) {
-			pref[i] = new IntVar(store, -1, 0);
-		}
-
-		// Add constraint if preferred distance is fulfilled the var is -1 otherwise 0
-		for (int i = 0; i < n_prefs; i++) {
+			pref[i] = new IntVar(store, "p_" + (i + 1), -1, 0);
 			store.impose(new IfThenElse(dist_prefs[i], new XeqC(pref[i], -1), new XeqC(pref[i], 0)));
 		}
 
