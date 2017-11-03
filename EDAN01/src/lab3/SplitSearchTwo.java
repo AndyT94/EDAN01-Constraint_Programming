@@ -185,20 +185,20 @@ public class SplitSearchTwo {
 		 */
 		public IntVar selectVariable(IntVar[] v) {
 			if (v.length != 0) {
+				// If smallest domain is found remove it
 				if (v[0].min() == v[0].max()) {
 					searchVariables = new IntVar[v.length - 1];
 					for (int i = 0; i < v.length - 1; i++) {
 						searchVariables[i] = v[i + 1];
 					}
 				} else {
+					// If smallest domain is not found put all back
 					searchVariables = new IntVar[v.length];
 					for (int i = 0; i < v.length; i++) {
 						searchVariables[i] = v[i];
 					}
 				}
-
 				return v[0];
-
 			} else {
 				System.err.println("Zero length list of variables for labeling");
 				return new IntVar(store);
