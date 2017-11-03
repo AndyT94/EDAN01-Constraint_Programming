@@ -1,5 +1,5 @@
-							Total #Nodes	Wrong decisions
-SimpleDFS					16057			7991
-SplitSearch 1				22463			11170
-SplitSearch 2				698132			348881
+					Total #Nodes	Wrong decisions
+SimpleDFS				16057		7991
+SplitSearch 1				22463		11170
+SplitSearch 2				698132		348881
 Variable selection method:	
