@@ -7,8 +7,7 @@ int: n_commercial;
 int: n_residential;
 array[0..n] of int: point_distribution;
 
-% The grid where 0 represents commercial 
-%   and 1 represents residential
+% The grid where 0 represents commercial and 1 represents residential
 array[1..n, 1..n] of var 0..1: grid;
 
 % Number of residential lots of each row and column
