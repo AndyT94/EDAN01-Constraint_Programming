@@ -41,5 +41,5 @@ constraint lex2(grid);
 % Solve the problem
 solve maximize cost;
 
-% Output
+% Output the cost and layout
 output ["Cost = ", show(cost), "\nLayout =\n", show2d(grid)];
