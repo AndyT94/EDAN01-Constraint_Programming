@@ -71,7 +71,7 @@ public class Photo {
 		// otherwise 0
 		IntVar[] pref = new IntVar[n_prefs];
 		for (int i = 0; i < n_prefs; i++) {
-			pref[i] = new IntVar(store, "p_" + (i + 1), -1, 0);
+			pref[i] = new IntVar(store, -1, 0);
 			store.impose(new IfThenElse(dist_prefs[i], new XeqC(pref[i], -1), new XeqC(pref[i], 0)));
 		}
 

@@ -10,11 +10,9 @@ import org.jacop.core.IntVar;
 import org.jacop.core.Store;
 import org.jacop.search.DepthFirstSearch;
 import org.jacop.search.IndomainMin;
-import org.jacop.search.PrintOutListener;
 import org.jacop.search.Search;
 import org.jacop.search.SelectChoicePoint;
 import org.jacop.search.SimpleMatrixSelect;
-import org.jacop.search.SmallestDomain;
 
 public class Logistics {
 	public static void main(String[] args) {
@@ -114,12 +112,12 @@ public class Logistics {
 		for (int i = 0; i < graph_size; i++) {
 			if (i != start - 1) {
 				PrimitiveConstraint c1 = new SumInt(store, column(path, i), ">", new IntVar(store, 0, 0));
-				PrimitiveConstraint c2 = new SumInt(store, path[i], "<", new IntVar(store, graph_size, graph_size));
+				PrimitiveConstraint c2 = new SumInt(store, path[i], ">=", new IntVar(store, 0, 0));
 				PrimitiveConstraint c3 = new SumInt(store, path[i], "==", new IntVar(store, 0, 0));
 				store.impose(new IfThenElse(c1, c2, c3));
 			}
 		}
-
+		
 		// The cost
 		IntVar output_cost = new IntVar(store, 0, IntDomain.MaxInt);
 		store.impose(new LinearInt(store, flatten_matrix(path), flatten_matrix(weight), "==", output_cost));
