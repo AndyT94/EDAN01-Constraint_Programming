@@ -18,7 +18,9 @@ import org.jacop.search.SimpleMatrixSelect;
 public class Logistics {
 	public static void main(String[] args) {
 		long start = System.currentTimeMillis();
+		
 		new Logistics().example(3);
+		
 		long end = System.currentTimeMillis();
 		System.out.println("Execution time: " + (end - start) + " ms");
 	}
@@ -97,7 +99,7 @@ public class Logistics {
 		store.impose(new SumInt(store, column(path, start - 1), "==", new IntVar(store, 0, 0)));
 
 		// Start at the start node
-		store.impose(new SumInt(store, path[start - 1], ">=", new IntVar(store, 1, 1)));
+		store.impose(new SumInt(store, path[start - 1], "==", new IntVar(store, 1, graph_size)));
 
 		// Must visit the destination nodes
 		for (int i = 0; i < n_dests; i++) {
@@ -106,14 +108,14 @@ public class Logistics {
 
 		// Each node can only be visited once
 		for (int i = 0; i < graph_size; i++) {
-			store.impose(new SumInt(store, column(path, i), "<=", new IntVar(store, 1, 1)));
+			store.impose(new SumInt(store, column(path, i), "==", new IntVar(store, 0, 1)));
 		}
 
 		// Can only leave nodes which have been visited
 		for (int i = 0; i < graph_size; i++) {
 			if (i != start - 1) {
 				PrimitiveConstraint c1 = new SumInt(store, column(path, i), "==", new IntVar(store, 1, 1));
-				PrimitiveConstraint c2 = new SumInt(store, path[i], ">=", new IntVar(store, 0, 0));
+				PrimitiveConstraint c2 = new SumInt(store, path[i], "==", new IntVar(store, 0, graph_size));
 				PrimitiveConstraint c3 = new SumInt(store, path[i], "==", new IntVar(store, 0, 0));
 				store.impose(new IfThenElse(c1, c2, c3));
 			}
