@@ -1,5 +1,6 @@
 package lab2;
 
+import org.jacop.constraints.IfThen;
 import org.jacop.constraints.IfThenElse;
 import org.jacop.constraints.LinearInt;
 import org.jacop.constraints.PrimitiveConstraint;
@@ -111,13 +112,22 @@ public class Logistics {
 		// Can only leave nodes which have been visited
 		for (int i = 0; i < graph_size; i++) {
 			if (i != start - 1) {
-				PrimitiveConstraint c1 = new SumInt(store, column(path, i), ">", new IntVar(store, 0, 0));
+				PrimitiveConstraint c1 = new SumInt(store, column(path, i), "==", new IntVar(store, 1, 1));
 				PrimitiveConstraint c2 = new SumInt(store, path[i], ">=", new IntVar(store, 0, 0));
 				PrimitiveConstraint c3 = new SumInt(store, path[i], "==", new IntVar(store, 0, 0));
 				store.impose(new IfThenElse(c1, c2, c3));
 			}
 		}
-		
+
+		// Can not return to a node traveled from
+		for (int i = 0; i < graph_size; i++) {
+			for (int j = 0; j < graph_size; j++) {
+				PrimitiveConstraint c1 = new XeqC(path[i][j], 1);
+				PrimitiveConstraint c2 = new XeqC(path[j][i], 0);
+				store.impose(new IfThen(c1, c2));
+			}
+		}
+
 		// The cost
 		IntVar output_cost = new IntVar(store, 0, IntDomain.MaxInt);
 		store.impose(new LinearInt(store, flatten_matrix(path), flatten_matrix(weight), "==", output_cost));
