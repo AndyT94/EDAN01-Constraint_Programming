@@ -43,10 +43,10 @@ import org.jacop.core.IntVar;
 import org.jacop.core.Store;
 import org.jacop.search.DepthFirstSearch;
 import org.jacop.search.IndomainMin;
-import org.jacop.search.InputOrderSelect;
-import org.jacop.search.PrintOutListener;
 import org.jacop.search.Search;
 import org.jacop.search.SelectChoicePoint;
+import org.jacop.search.SimpleSelect;
+import org.jacop.search.SmallestMin;
 
 /**
  * 
@@ -166,11 +166,19 @@ public class Golomb {
 
 		IntVar cost = numbers[numbers.length - 1];
 
-		SplitSearchOne search = new SplitSearchOne(store);
-		search.setVariablesToReport(numbers);
-		search.setCostVariable(cost);
-
-		boolean result = search.label(numbers);
+		// SplitSearchOne search = new SplitSearchOne(store);
+		// search.setVariablesToReport(numbers);
+		// search.setCostVariable(cost);
+		// boolean result = search.label(numbers);
+		Search<IntVar> search = new DepthFirstSearch<IntVar>();
+		SelectChoicePoint<IntVar> select = new SimpleSelect<IntVar>(numbers, new SmallestMin<IntVar>(),
+				new IndomainMin<IntVar>());
+		boolean result = search.labeling(store, select, cost);
+		if (result) {
+			System.out.println("Cost: " + cost.value());
+		} else {
+			System.out.println("No solution found!");
+		}
 
 		System.out.println(result);
 
