@@ -1,13 +1,13 @@
-							Total #Nodes	Wrong decisions
-SimpleDFS					16057			7991
-SplitSearch 1				22463			11170
-SplitSearch 2				698132			348881
+				Total #Nodes	Wrong decisions
+SimpleDFS			16057		7991
+SplitSearch 1			22463		11170
+SplitSearch 2			698132		348881
 Variable selection method:	
-LargestDomain				294099			147041
-LargestMax					88370			44183
-LargestMin					88370			44187
-SmallestDomain				53331			26662
-SmallestMax					31929			15958	<-- BEST
-SmallestMin					31929			15958	<-- BEST
-MaxRegret					39442			19715	Largest difference between smallest and second smallest value in domain
-MostConstrainedStatic		38153			19073
+LargestDomain			294099		147041
+LargestMax			88370		44183
+LargestMin			88370		44187
+SmallestDomain			53331		26662
+SmallestMax			31929		15958	<-- BEST
+SmallestMin			31929		15958	<-- BEST
+MaxRegret			39442		19715	Largest difference between smallest and second smallest value in domain
+MostConstrainedStatic		38153		19073

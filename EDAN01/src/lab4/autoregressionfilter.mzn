@@ -1,4 +1,5 @@
 include "globals.mzn";
+include "diffn.mzn";
 
 % Data input
 int: del_add;
@@ -10,9 +11,44 @@ set of int: last;
 set of int: add;
 set of int: mul;
 array[1..n] of set of int: dependencies;
+int: max_cycles = if del_add > del_mul then n * del_add else n * del_mul endif;
 
-var int: cost;
+% List of tasks' duration
+array[1..length(add)] of int: dur_add = [del_add | i in 1..length(add)];
+array[1..length(mul)] of int: dur_mul = [del_mul | i in 1..length(mul)];
+array[1..n] of var int: dur_all;
 
-solve minimize cost;
+% List of resource capacity
+array[1..length(add)] of int: res_add = [1 | i in 1..length(add)];
+array[1..length(mul)] of int: res_mul = [1 | i in 1..length(mul)];
 
-output ["Clock cycles: ", show(cost)];
+% List of tasks' start
+array[1..length(add)] of var 0..max_cycles: start_add;
+array[1..length(mul)] of var 0..max_cycles: start_mul;
+array[1..n] of var 0..max_cycles: start_all;
+
+% List of assigned adder/multiplier
+array[1..length(add)] of var 1..number_add: assigned_add;
+array[1..length(mul)] of var 1..number_mul: assigned_mul;
+
+var int: total_cycles;
+
+% Constraints
+constraint forall (i in index_set(add)) (dur_all[add[i]] = del_add /\ start_all[add[i]] = start_add[i]);
+constraint forall (i in index_set(mul)) (dur_all[mul[i]] = del_mul /\ start_all[mul[i]] = start_mul[i]);
+
+% Resource constraints
+constraint cumulative(start_add, dur_add, res_add, number_add);
+constraint cumulative(start_mul, dur_mul, res_mul, number_mul);
+
+constraint diffn(start_add, assigned_add, dur_add, res_add);
+constraint diffn(start_mul, assigned_mul, dur_mul, res_mul);
+
+% Precedence constraints
+constraint forall (i in 1..n, j in dependencies[i]) (start_all[i] + dur_all[i] <= start_all[j]);
+
+constraint forall (i in index_set(last)) (start_all[last[i]] + dur_all[last[i]] <= total_cycles);
+
+solve :: int_search(start_add++start_mul, first_fail, indomain_min, complete) minimize total_cycles;
+
+output ["Clock cycles: ", show(total_cycles), "\nAdder: ", show(start_add), "\nMuler: ", show(start_mul), "\nAA: ", show(assigned_add), "\nAM: ", show(assigned_mul)];

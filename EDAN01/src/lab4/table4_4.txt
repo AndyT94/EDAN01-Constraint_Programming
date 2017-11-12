@@ -1,0 +1,30 @@
+Configuration           Operation assignment    Clock cycles    runtime [ms]    Optimal?
+1 adder, 1 multiplier   adder 1:
+                        mul 1:
+
+1 adder, 2 multiplier   adder 1:
+                        mul 1:
+                        mul 2:
+
+1 adder, 3 multiplier   adder 1:
+                        mul 1:
+                        mul 2:
+                        mul 3:
+
+2 adder, 2 multiplier   adder 1:
+                        adder 2:
+                        mul 1:
+                        mul 2:
+
+2 adder, 3 multiplier   adder 1:
+                        adder 2:
+                        mul 1:
+                        mul 2:
+                        mul 3:
+
+2 adder, 4 multiplier   adder 1:
+                        adder 2:
+                        mul 1:
+                        mul 2:
+                        mul 3:
+                        mul 4:
