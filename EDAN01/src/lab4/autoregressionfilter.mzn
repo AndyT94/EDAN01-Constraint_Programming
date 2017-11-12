@@ -51,4 +51,5 @@ constraint forall (i in index_set(last)) (start_all[last[i]] + dur_all[last[i]] 
 
 solve :: int_search(start_add++start_mul, first_fail, indomain_min, complete) minimize total_cycles;
 
-output ["Clock cycles: ", show(total_cycles), "\nAdder: ", show(start_add), "\nMuler: ", show(start_mul), "\nAA: ", show(assigned_add), "\nAM: ", show(assigned_mul)];
+output ["Clock cycles: ", show(total_cycles), "\nAdder:\t\t", show(array1d(add)), "\nAdder start:\t", show(start_add), "\nAssigned adder:\t", show(assigned_add), 
+            "\nMultiplier:\t", show(array1d(mul)), "\nMul start:\t", show(start_mul), "\nAssigned mul:\t", show(assigned_mul)];
