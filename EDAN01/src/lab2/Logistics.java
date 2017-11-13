@@ -77,10 +77,10 @@ public class Logistics {
 		Store store = new Store();
 
 		// Initialize path matrix. 0 for no path and 1 for path
-		IntVar[][] path = new IntVar[graph_size][graph_size];
+		IntVar[][] edge = new IntVar[graph_size][graph_size];
 		for (int i = 0; i < graph_size; i++) {
 			for (int j = 0; j < graph_size; j++) {
-				path[i][j] = new IntVar(store, 0, 1);
+				edge[i][j] = new IntVar(store, 0, 1);
 			}
 		}
 
@@ -90,33 +90,33 @@ public class Logistics {
 		for (int i = 0; i < graph_size; i++) {
 			for (int j = 0; j < graph_size; j++) {
 				if (weight[i][j] == 0) {
-					store.impose(new XeqC(path[i][j], 0));
+					store.impose(new XeqC(edge[i][j], 0));
 				}
 			}
 		}
 
 		// No need to visit start node
-		store.impose(new SumInt(store, column(path, start - 1), "==", new IntVar(store, 0, 0)));
+		store.impose(new SumInt(store, column(edge, start - 1), "==", new IntVar(store, 0, 0)));
 
 		// Start at the start node
-		store.impose(new SumInt(store, path[start - 1], "==", new IntVar(store, 1, graph_size)));
+		store.impose(new SumInt(store, edge[start - 1], "==", new IntVar(store, 1, graph_size)));
 
 		// Must visit the destination nodes
 		for (int i = 0; i < n_dests; i++) {
-			store.impose(new SumInt(store, column(path, dest[i] - 1), "==", new IntVar(store, 1, 1)));
+			store.impose(new SumInt(store, column(edge, dest[i] - 1), "==", new IntVar(store, 1, 1)));
 		}
 
 		// Each node can only be visited once
 		for (int i = 0; i < graph_size; i++) {
-			store.impose(new SumInt(store, column(path, i), "==", new IntVar(store, 0, 1)));
+			store.impose(new SumInt(store, column(edge, i), "==", new IntVar(store, 0, 1)));
 		}
 
 		// Can only leave nodes which have been visited
 		for (int i = 0; i < graph_size; i++) {
 			if (i != start - 1) {
-				PrimitiveConstraint c1 = new SumInt(store, column(path, i), "==", new IntVar(store, 1, 1));
-				PrimitiveConstraint c2 = new SumInt(store, path[i], "==", new IntVar(store, 0, graph_size));
-				PrimitiveConstraint c3 = new SumInt(store, path[i], "==", new IntVar(store, 0, 0));
+				PrimitiveConstraint c1 = new SumInt(store, column(edge, i), "==", new IntVar(store, 1, 1));
+				PrimitiveConstraint c2 = new SumInt(store, edge[i], "==", new IntVar(store, 0, graph_size));
+				PrimitiveConstraint c3 = new SumInt(store, edge[i], "==", new IntVar(store, 0, 0));
 				store.impose(new IfThenElse(c1, c2, c3));
 			}
 		}
@@ -124,23 +124,23 @@ public class Logistics {
 		// Can not return to a node traveled from
 		for (int i = 0; i < graph_size; i++) {
 			for (int j = 0; j < graph_size; j++) {
-				PrimitiveConstraint c1 = new XeqC(path[i][j], 1);
-				PrimitiveConstraint c2 = new XeqC(path[j][i], 0);
+				PrimitiveConstraint c1 = new XeqC(edge[i][j], 1);
+				PrimitiveConstraint c2 = new XeqC(edge[j][i], 0);
 				store.impose(new IfThen(c1, c2));
 			}
 		}
 
 		// The cost
 		IntVar output_cost = new IntVar(store, 0, IntDomain.MaxInt);
-		store.impose(new LinearInt(store, flatten_matrix(path), flatten_matrix(weight), "==", output_cost));
+		store.impose(new LinearInt(store, flatten_matrix(edge), flatten_matrix(weight), "==", output_cost));
 
 		// Search for solution
 		Search<IntVar> search = new DepthFirstSearch<IntVar>();
-		SelectChoicePoint<IntVar> select = new SimpleMatrixSelect<IntVar>(path, null, new IndomainMin<IntVar>());
+		SelectChoicePoint<IntVar> select = new SimpleMatrixSelect<IntVar>(edge, null, new IndomainMin<IntVar>());
 		boolean result = search.labeling(store, select, output_cost);
 		if (result) {
 			System.out.println("Cost: " + output_cost.value());
-			print(path);
+			print(edge);
 		} else {
 			System.out.println("No solution found!");
 		}
