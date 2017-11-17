@@ -1,11 +1,12 @@
 package lab2;
 
 import org.jacop.constraints.IfThen;
-import org.jacop.constraints.IfThenElse;
 import org.jacop.constraints.LinearInt;
 import org.jacop.constraints.PrimitiveConstraint;
-import org.jacop.constraints.SumInt;
+import org.jacop.constraints.Subcircuit;
 import org.jacop.constraints.XeqC;
+import org.jacop.constraints.XeqY;
+import org.jacop.constraints.XneqC;
 import org.jacop.core.IntDomain;
 import org.jacop.core.IntVar;
 import org.jacop.core.Store;
@@ -15,12 +16,12 @@ import org.jacop.search.Search;
 import org.jacop.search.SelectChoicePoint;
 import org.jacop.search.SimpleMatrixSelect;
 
-public class Logistics2 {
+public class Logistics {
 	public static void main(String[] args) {
 		long start = System.currentTimeMillis();
-		
-		new Logistics2().example(3);
-		
+
+		new Logistics().example(3);
+
 		long end = System.currentTimeMillis();
 		System.out.println("Execution time: " + (end - start) + " ms");
 	}
@@ -76,7 +77,7 @@ public class Logistics2 {
 		// Create store
 		Store store = new Store();
 
-		// Initialize edge matrix. 0 for edge not visited and 1 for edge visited
+		// Initialize the edges
 		IntVar[][] edge = new IntVar[graph_size][graph_size];
 		for (int i = 0; i < graph_size; i++) {
 			for (int j = 0; j < graph_size; j++) {
@@ -85,61 +86,72 @@ public class Logistics2 {
 		}
 
 		// Initialize weight matrix
-		int[][] weight = init_weights(graph_size, from, to, cost);
-		// If weight is 0 then there is no path
-		for (int i = 0; i < graph_size; i++) {
+		int[][] weight = init_weights(graph_size, n_edges, from, to, cost);
+
+		// Initialize the graphs for each destination
+		IntVar[][] graph = new IntVar[n_dests][graph_size];
+		for (int i = 0; i < n_dests; i++) {
+			for (int j = 1; j <= graph_size; j++) {
+				graph[i][j - 1] = new IntVar(store, j, j);
+			}
+
+		}
+
+		// Destination nodes are connected to start
+		for (int i = 0; i < n_dests; i++) {
+			graph[i][dest[i] - 1].addDom(start, start);
+		}
+
+		// Add the connected nodes to the domain
+		for (int i = 0; i < n_dests; i++) {
 			for (int j = 0; j < graph_size; j++) {
-				if (weight[i][j] == 0) {
-					store.impose(new XeqC(edge[i][j], 0));
+				for (int k = 0; k < graph_size; k++) {
+					if (weight[j][k] > 0) {
+						graph[i][j].addDom(k + 1, k + 1);
+					}
 				}
 			}
 		}
 
-		// No need to visit start node
-		store.impose(new SumInt(store, column(edge, start - 1), "==", new IntVar(store, 0, 0)));
-
-		// Start at the start node
-		store.impose(new SumInt(store, edge[start - 1], "==", new IntVar(store, 1, graph_size)));
-
-		// Must visit the destination nodes
 		for (int i = 0; i < n_dests; i++) {
-			store.impose(new SumInt(store, column(edge, dest[i] - 1), "==", new IntVar(store, 1, 1)));
+			// Must leave start node
+			store.impose(new XneqC(graph[i][start - 1], start));
+			// Destination node connected to start
+			store.impose(new XeqC(graph[i][dest[i] - 1], start));
+			store.impose(new Subcircuit(graph[i]));
 		}
 
-		// Each node can only be visited once
+		IntVar[] sub_cost = new IntVar[graph_size];
 		for (int i = 0; i < graph_size; i++) {
-			store.impose(new SumInt(store, column(edge, i), "==", new IntVar(store, 0, 1)));
+			sub_cost[i] = new IntVar(store, 0, IntDomain.MaxInt);
 		}
 
-		// Can only leave nodes which have been visited
-		for (int i = 0; i < graph_size; i++) {
-			if (i != start - 1) {
-				PrimitiveConstraint c1 = new SumInt(store, column(edge, i), "==", new IntVar(store, 1, 1));
-				PrimitiveConstraint c2 = new SumInt(store, edge[i], "==", new IntVar(store, 0, graph_size));
-				PrimitiveConstraint c3 = new SumInt(store, edge[i], "==", new IntVar(store, 0, 0));
-				store.impose(new IfThenElse(c1, c2, c3));
-			}
+		IntVar[] nodes = new IntVar[graph_size];
+		for (int i = 1; i <= graph_size; i++) {
+			nodes[i - 1] = new IntVar(store, i, i);
 		}
 
-		// Can not return to a node traveled from
-		for (int i = 0; i < graph_size; i++) {
+		// Get the visited edges cost
+		for (int i = 0; i < n_dests; i++) {
 			for (int j = 0; j < graph_size; j++) {
-				PrimitiveConstraint c1 = new XeqC(edge[i][j], 1);
-				PrimitiveConstraint c2 = new XeqC(edge[j][i], 0);
-				store.impose(new IfThen(c1, c2));
+				for (int k = 0; k < graph_size; k++) {
+					PrimitiveConstraint c1 = new XeqY(graph[i][j], nodes[k]);
+					PrimitiveConstraint c2 = new XeqC(edge[j][k], 1);
+					store.impose(new IfThen(c1, c2));
+				}
 			}
 		}
 
 		// The cost
-		IntVar output_cost = new IntVar(store, 0, IntDomain.MaxInt);
-		store.impose(new LinearInt(store, flatten_matrix(edge), flatten_matrix(weight), "==", output_cost));
+		IntVar total_cost = new IntVar(store, 0, IntDomain.MaxInt);
+		store.impose(new LinearInt(store, flatten_matrix(edge), flatten_matrix(weight), "==", total_cost));
 
 		// Search for solution
 		Search<IntVar> search = new DepthFirstSearch<IntVar>();
-		SelectChoicePoint<IntVar> select = new SimpleMatrixSelect<IntVar>(edge, null, new IndomainMin<IntVar>());
-		boolean result = search.labeling(store, select, output_cost);
+		SelectChoicePoint<IntVar> select = new SimpleMatrixSelect<IntVar>(graph, null, new IndomainMin<IntVar>());
+		boolean result = search.labeling(store, select, total_cost);
 		if (result) {
-			System.out.println("Cost: " + output_cost.value());
+			System.out.println("Cost: " + total_cost.value());
 			print(edge);
 		} else {
 			System.out.println("No solution found!");
@@ -147,15 +159,15 @@ public class Logistics2 {
 	}
 
 	/**
-	 * Prints the path chosen in the format (Node from) -> (Node to)
+	 * Prints the edges chosen in the format (Node from) -> (Node to)
 	 * 
-	 * @param path
+	 * @param edge
 	 *            The matrix
 	 */
-	private void print(IntVar[][] path) {
-		for (int i = 0; i < path.length; i++) {
-			for (int j = 0; j < path[0].length; j++) {
-				if (path[i][j].value() == 1) {
+	private void print(IntVar[][] edge) {
+		for (int i = 0; i < edge.length; i++) {
+			for (int j = 0; j < edge[0].length; j++) {
+				if (edge[i][j].value() == 1) {
 					System.out.println((i + 1) + " -> " + (j + 1));
 				}
 			}
@@ -197,23 +209,6 @@ public class Logistics2 {
 	}
 
 	/**
-	 * Get column i of an IntVar matrix
-	 * 
-	 * @param path
-	 *            The matrix
-	 * @param i
-	 *            The column
-	 * @return IntVar array
-	 */
-	private IntVar[] column(IntVar[][] path, int i) {
-		IntVar[] col = new IntVar[path[i].length];
-		for (int j = 0; j < col.length; j++) {
-			col[j] = path[j][i];
-		}
-		return col;
-	}
-
-	/**
 	 * Initialize the weight matrix
 	 * 
 	 * @param graph_size
@@ -226,9 +221,9 @@ public class Logistics2 {
 	 *            The weight for the path from node from to node to
 	 * @return An int matrix
 	 */
-	private int[][] init_weights(int graph_size, int[] from, int[] to, int[] cost) {
+	private int[][] init_weights(int graph_size, int n_edges, int[] from, int[] to, int[] cost) {
 		int[][] weight = new int[graph_size][graph_size];
-		for (int i = 0; i < from.length; i++) {
+		for (int i = 0; i < n_edges; i++) {
 			weight[from[i] - 1][to[i] - 1] = cost[i];
 			weight[to[i] - 1][from[i] - 1] = cost[i];
 		}

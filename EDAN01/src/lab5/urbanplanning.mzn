@@ -22,7 +22,7 @@ array[1..n] of var int: points_col;
 var int: cost;
 
 % Constraint for number of residential lots
-constraint n_residential = sum (i in 1..n) (residentials_row[i]);
+constraint sum (i in 1..n) (residentials_row[i]) = n_residential;
 
 % Sum the residential lots of each row and column
 constraint forall (i in 1..n) (residentials_row[i] = sum (j in 1..n) (grid[i, j]));
