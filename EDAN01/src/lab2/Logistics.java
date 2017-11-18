@@ -5,7 +5,6 @@ import org.jacop.constraints.LinearInt;
 import org.jacop.constraints.PrimitiveConstraint;
 import org.jacop.constraints.Subcircuit;
 import org.jacop.constraints.XeqC;
-import org.jacop.constraints.XeqY;
 import org.jacop.constraints.XneqC;
 import org.jacop.core.IntDomain;
 import org.jacop.core.IntVar;
@@ -20,7 +19,7 @@ public class Logistics {
 	public static void main(String[] args) {
 		long start = System.currentTimeMillis();
 
-		new Logistics().example(1);
+		new Logistics().example(3);
 
 		long end = System.currentTimeMillis();
 		System.out.println("Execution time: " + (end - start) + " ms");
@@ -94,16 +93,7 @@ public class Logistics {
 			for (int j = 1; j <= graph_size; j++) {
 				graph[i][j - 1] = new IntVar(store, j, j);
 			}
-
-		}
-
-		// Destination nodes are connected to start
-		for (int i = 0; i < n_dests; i++) {
-			graph[i][dest[i] - 1].addDom(start, start);
-		}
-
-		// Add the connected nodes to the domain
-		for (int i = 0; i < n_dests; i++) {
+			// Add the connected nodes to the domain
 			for (int j = 0; j < graph_size; j++) {
 				for (int k = 0; k < graph_size; k++) {
 					if (weight[j][k] > 0) {
@@ -116,14 +106,11 @@ public class Logistics {
 		for (int i = 0; i < n_dests; i++) {
 			// Must leave start node
 			store.impose(new XneqC(graph[i][start - 1], start));
-			// Destination node connected to start
+			// Destination nodes are connected to start
+			graph[i][dest[i] - 1].addDom(start, start);
+			// Destination node must be connected to start
 			store.impose(new XeqC(graph[i][dest[i] - 1], start));
 			store.impose(new Subcircuit(graph[i]));
-		}
-
-		IntVar[] sub_cost = new IntVar[graph_size];
-		for (int i = 0; i < graph_size; i++) {
-			sub_cost[i] = new IntVar(store, 0, IntDomain.MaxInt);
 		}
 
 		// Get the visited edges
