@@ -20,7 +20,7 @@ public class Logistics {
 	public static void main(String[] args) {
 		long start = System.currentTimeMillis();
 
-		new Logistics().example(3);
+		new Logistics().example(1);
 
 		long end = System.currentTimeMillis();
 		System.out.println("Execution time: " + (end - start) + " ms");
@@ -126,16 +126,11 @@ public class Logistics {
 			sub_cost[i] = new IntVar(store, 0, IntDomain.MaxInt);
 		}
 
-		IntVar[] nodes = new IntVar[graph_size];
-		for (int i = 1; i <= graph_size; i++) {
-			nodes[i - 1] = new IntVar(store, i, i);
-		}
-
-		// Get the visited edges cost
+		// Get the visited edges
 		for (int i = 0; i < n_dests; i++) {
 			for (int j = 0; j < graph_size; j++) {
 				for (int k = 0; k < graph_size; k++) {
-					PrimitiveConstraint c1 = new XeqY(graph[i][j], nodes[k]);
+					PrimitiveConstraint c1 = new XeqC(graph[i][j], k + 1);
 					PrimitiveConstraint c2 = new XeqC(edge[j][k], 1);
 					store.impose(new IfThen(c1, c2));
 				}
