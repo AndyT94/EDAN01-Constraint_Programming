@@ -186,7 +186,7 @@ public class SplitSearchOne {
 		public IntVar selectVariable(IntVar[] v) {
 			if (v.length != 0) {
 				// If smallest domain is found remove it
-				if (v[0].min() == v[0].max()) {
+				if (v[0].singleton()) {
 					searchVariables = new IntVar[v.length - 1];
 					for (int i = 0; i < v.length - 1; i++) {
 						searchVariables[i] = v[i + 1];
