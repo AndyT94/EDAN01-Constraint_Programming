@@ -41,11 +41,6 @@ import org.jacop.constraints.XplusClteqZ;
 import org.jacop.constraints.XplusYeqZ;
 import org.jacop.core.IntVar;
 import org.jacop.core.Store;
-import org.jacop.search.DepthFirstSearch;
-import org.jacop.search.IndomainMin;
-import org.jacop.search.Search;
-import org.jacop.search.SelectChoicePoint;
-import org.jacop.search.SimpleSelect;
 import org.jacop.search.SmallestMin;
 
 /**
@@ -166,7 +161,7 @@ public class Golomb {
 
 		IntVar cost = numbers[numbers.length - 1];
 
-		 SplitSearchOne search = new SplitSearchOne(store);
+		 SmallestMinimum search = new SmallestMinimum(store);
 		 search.setVariablesToReport(numbers);
 		 search.setCostVariable(cost);
 		 boolean result = search.label(numbers);

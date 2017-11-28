@@ -11,3 +11,5 @@ SmallestMax			31929		15958	<-- BEST
 SmallestMin			31929		15958	<-- BEST
 MaxRegret			39442		19715	Largest difference between smallest and second smallest value in domain
 MostConstrainedStatic		38153		19073
+
+OwnSmallestMinimum	21683	10788

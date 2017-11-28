@@ -1,5 +1,7 @@
 package lab3;
 
+import java.util.Arrays;
+
 import org.jacop.constraints.Not;
 import org.jacop.constraints.PrimitiveConstraint;
 import org.jacop.constraints.XgteqC;
@@ -185,18 +187,12 @@ public class SplitSearchTwo {
 		 */
 		public IntVar selectVariable(IntVar[] v) {
 			if (v.length != 0) {
-				// If smallest domain is found remove it
+				// // If variable is determined remove it
 				if (v[0].singleton()) {
-					searchVariables = new IntVar[v.length - 1];
-					for (int i = 0; i < v.length - 1; i++) {
-						searchVariables[i] = v[i + 1];
-					}
+					searchVariables = Arrays.copyOfRange(v, 1, v.length);
 				} else {
-					// If smallest domain is not found put all back
-					searchVariables = new IntVar[v.length];
-					for (int i = 0; i < v.length; i++) {
-						searchVariables[i] = v[i];
-					}
+					// Put all back
+					searchVariables = Arrays.copyOfRange(v, 0, v.length);
 				}
 				return v[0];
 			} else {

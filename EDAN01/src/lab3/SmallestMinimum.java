@@ -1,16 +1,54 @@
+/**
+ *  SimpleDFS.java 
+ *  This file is part of JaCoP.
+ *
+ *  JaCoP is a Java Constraint Programming solver. 
+ *	
+ *	Copyright (C) 2000-2008 Krzysztof Kuchcinski and Radoslaw Szymanek
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *  
+ *  Notwithstanding any other provision of this License, the copyright
+ *  owners of this work supplement the terms of this License with terms
+ *  prohibiting misrepresentation of the origin of this work and requiring
+ *  that modified versions of this work be marked in reasonable ways as
+ *  different from the original version. This supplement of the license
+ *  terms is in accordance with Section 7 of GNU Affero General Public
+ *  License version 3.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package lab3;
 
 import java.util.Arrays;
 
 import org.jacop.constraints.Not;
 import org.jacop.constraints.PrimitiveConstraint;
-import org.jacop.constraints.XlteqC;
+import org.jacop.constraints.XeqC;
 import org.jacop.core.FailException;
 import org.jacop.core.IntDomain;
 import org.jacop.core.IntVar;
 import org.jacop.core.Store;
 
-public class SplitSearchOne {
+/**
+ * Implements Simple Depth First Search .
+ * 
+ * @author Krzysztof Kuchcinski
+ * @version 4.1
+ */
+
+public class SmallestMinimum {
 
 	boolean trace = false;
 
@@ -49,7 +87,7 @@ public class SplitSearchOne {
 	 */
 	private int wrong = 0;
 
-	public SplitSearchOne(Store s) {
+	public SmallestMinimum(Store s) {
 		store = s;
 	}
 
@@ -183,18 +221,38 @@ public class SplitSearchOne {
 		}
 
 		/**
-		 * example variable selection; input order
+		 * example variable selection; smallest min
 		 */
-		public IntVar selectVariable(IntVar[] v) {
+		IntVar selectVariable(IntVar[] v) {
 			if (v.length != 0) {
+				// Find smallest min
+				int min = 0;
+				int smallest = Integer.MAX_VALUE;
+				for (int i = 0; i < v.length; i++) {
+					if (v[i].min() < smallest) {
+						min = i;
+						smallest = v[i].min();
+					}
+				}
+
 				// If variable is determined remove it
-				if (v[0].singleton()) {
-					searchVariables = Arrays.copyOfRange(v, 1, v.length);
+				if (v[min].singleton()) {
+					searchVariables = new IntVar[v.length - 1];
+					int j = 0;
+					for (int i = 0; i < searchVariables.length; i++) {
+						if (j == min) {
+							j++;
+						}
+						searchVariables[i] = v[j];
+						j++;
+					}
 				} else {
 					// Put all back
 					searchVariables = Arrays.copyOfRange(v, 0, v.length);
 				}
-				return v[0];
+
+				return v[min];
+
 			} else {
 				System.err.println("Zero length list of variables for labeling");
 				return new IntVar(store);
@@ -204,15 +262,15 @@ public class SplitSearchOne {
 		/**
 		 * example value selection; indomain_min
 		 */
-		public int selectValue(IntVar v) {
-			return (v.max() + v.min()) / 2;
+		int selectValue(IntVar v) {
+			return v.min();
 		}
 
 		/**
 		 * example constraint assigning a selected value
 		 */
 		public PrimitiveConstraint getConstraint() {
-			return new XlteqC(var, value);
+			return new XeqC(var, value);
 		}
 	}
 }
