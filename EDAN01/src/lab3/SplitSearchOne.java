@@ -192,7 +192,7 @@ public class SplitSearchOne {
 					searchVariables = Arrays.copyOfRange(v, 1, v.length);
 				} else {
 					// Put all back
-					searchVariables = Arrays.copyOfRange(v, 0, v.length);
+					searchVariables = v;
 				}
 				return v[0];
 			} else {

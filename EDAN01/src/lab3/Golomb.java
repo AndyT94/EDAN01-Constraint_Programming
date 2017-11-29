@@ -161,19 +161,20 @@ public class Golomb {
 
 		IntVar cost = numbers[numbers.length - 1];
 
-		 SmallestMinimum search = new SmallestMinimum(store);
-		 search.setVariablesToReport(numbers);
-		 search.setCostVariable(cost);
-		 boolean result = search.label(numbers);
-//		Search<IntVar> search = new DepthFirstSearch<IntVar>();
-//		SelectChoicePoint<IntVar> select = new SimpleSelect<IntVar>(numbers, new SmallestMin<IntVar>(),
-//				new IndomainMin<IntVar>());
-//		boolean result = search.labeling(store, select, cost);
-//		if (result) {
-//			System.out.println("Cost: " + cost.value());
-//		} else {
-//			System.out.println("No solution found!");
-//		}
+		SplitSearchTwo search = new SplitSearchTwo(store);
+		search.setVariablesToReport(numbers);
+		search.setCostVariable(cost);
+		boolean result = search.label(numbers);
+		// Search<IntVar> search = new DepthFirstSearch<IntVar>();
+		// SelectChoicePoint<IntVar> select = new SimpleSelect<IntVar>(numbers, new
+		// SmallestMin<IntVar>(),
+		// new IndomainMin<IntVar>());
+		// boolean result = search.labeling(store, select, cost);
+		// if (result) {
+		// System.out.println("Cost: " + cost.value());
+		// } else {
+		// System.out.println("No solution found!");
+		// }
 
 		System.out.println(result);
 

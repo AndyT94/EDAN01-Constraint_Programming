@@ -31,8 +31,6 @@
 
 package lab3;
 
-import java.util.Arrays;
-
 import org.jacop.constraints.Not;
 import org.jacop.constraints.PrimitiveConstraint;
 import org.jacop.constraints.XeqC;
@@ -248,7 +246,7 @@ public class SmallestMinimum {
 					}
 				} else {
 					// Put all back
-					searchVariables = Arrays.copyOfRange(v, 0, v.length);
+					searchVariables = v;
 				}
 
 				return v[min];
