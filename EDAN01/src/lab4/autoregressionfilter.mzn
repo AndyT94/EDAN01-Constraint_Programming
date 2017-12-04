@@ -49,7 +49,7 @@ constraint forall (i in 1..n, j in dependencies[i]) (start_all[i] + dur_all[i] <
 
 constraint forall (i in index_set(last)) (start_all[last[i]] + dur_all[last[i]] <= total_cycles);
 
-solve :: int_search(start_add++start_mul, first_fail, indomain_min, complete) minimize total_cycles;
+solve :: int_search(start_all, first_fail, indomain_min, complete) minimize total_cycles;
 
 output ["Clock cycles: ", show(total_cycles), "\nAdder:\t\t", show(array1d(add)), "\nAdder start:\t", show(start_add), "\nAssigned adder:\t", show(assigned_add), 
             "\nMultiplier:\t", show(array1d(mul)), "\nMul start:\t", show(start_mul), "\nAssigned mul:\t", show(assigned_mul)];
